@@ -4,6 +4,7 @@ import com.intellij.notification.Notification
 import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.jetbrains.rd.util.reactive.adviseNotNull
 import com.jetbrains.rdclient.util.idea.ProtocolSubscribedProjectComponent
@@ -21,7 +22,7 @@ class OutOfSyncEditorNotification(project: Project): ProtocolSubscribedProjectCo
             val message = "The Unity editor plugin is out of date and automatic plugin updates are disabled. Advanced Unity integration features are unavailable until the plugin is updated."
 
             val notification = Notification(notificationGroupId.displayId, "Unity editor plugin update required", message, NotificationType.WARNING)
-            notification.addAction(object : InstallEditorPluginAction(){})
+            notification.addAction(ActionManager.getInstance().getAction("InstallEditorPluginAction"))
             Notifications.Bus.notify(notification, project)
         }
     }
