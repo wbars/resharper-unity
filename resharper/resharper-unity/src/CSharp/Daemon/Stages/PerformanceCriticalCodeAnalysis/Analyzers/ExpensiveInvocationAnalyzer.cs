@@ -12,15 +12,15 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
     public class ExpensiveInvocationAnalyzer : PerformanceProblemAnalyzerBase<IInvocationExpression>
     {
         private readonly CallGraphSwaExtensionProvider mySwaExtensionProvider;
-        private readonly ExpensiveCodeCallGraphAnalyzer myExpensiveCodeCallGraphAnalyzer;
+        private readonly ExpensiveCodeCallGraphRootMarksProvider myExpensiveCodeCallGraphRootMarksProvider;
         private readonly IElementIdProvider myProvider;
 
         public ExpensiveInvocationAnalyzer(CallGraphSwaExtensionProvider callGraphSwaExtensionProvider,
-            ExpensiveCodeCallGraphAnalyzer expensiveCodeCallGraphAnalyzer,
+            ExpensiveCodeCallGraphRootMarksProvider expensiveCodeCallGraphRootMarksProvider,
             IElementIdProvider provider)
         {
             mySwaExtensionProvider = callGraphSwaExtensionProvider;
-            myExpensiveCodeCallGraphAnalyzer = expensiveCodeCallGraphAnalyzer;
+            myExpensiveCodeCallGraphRootMarksProvider = expensiveCodeCallGraphRootMarksProvider;
             myProvider = provider;
         }
 
@@ -40,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
                 if (!id.HasValue)
                     return;
 
-                if (mySwaExtensionProvider.IsMarkedByCallGraphAnalyzer(myExpensiveCodeCallGraphAnalyzer.Id, true, id.Value))
+                if (mySwaExtensionProvider.IsMarkedByCallGraphRootMarksProvider(myExpensiveCodeCallGraphRootMarksProvider.Id, true, id.Value))
                 {
                     CreateHiglighting(expression, consumer);
                 }

@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.Rider.Highlightings.IconsProviders
         private readonly IElementIdProvider myProvider;
 
         public RiderInitialiseOnLoadCctorDetector(ISolution solution, CallGraphSwaExtensionProvider callGraphSwaExtensionProvider, 
-            SettingsStore settingsStore, PerformanceCriticalCodeCallGraphMarksProvider marksProvider, UnityCodeInsightFieldUsageProvider fieldUsageProvider,
+            SettingsStore settingsStore, PerformanceCriticalCodeCallGraphRootMarksProvider marksProvider, UnityCodeInsightFieldUsageProvider fieldUsageProvider,
             UnitySolutionTracker solutionTracker, ConnectionTracker connectionTracker,
             IconHost iconHost, IElementIdProvider provider)
             : base(solution, callGraphSwaExtensionProvider, settingsStore, marksProvider, provider)

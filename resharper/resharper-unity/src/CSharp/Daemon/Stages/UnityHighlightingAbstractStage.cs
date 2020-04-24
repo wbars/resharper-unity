@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
     public abstract class UnityHighlightingAbstractStage : CSharpDaemonStageBase
     {
         private readonly CallGraphSwaExtensionProvider myCallGraphSwaExtensionProvider;
-        private readonly PerformanceCriticalCodeCallGraphMarksProvider myPerformanceCriticalCodeCallGraphMarksProvider;
+        private readonly PerformanceCriticalCodeCallGraphRootMarksProvider myPerformanceCriticalCodeCallGraphRootMarksProvider;
         protected readonly IEnumerable<IUnityDeclarationHighlightingProvider> HiglightingProviders;
         protected readonly IEnumerable<IUnityProblemAnalyzer> PerformanceProblemAnalyzers;
         protected readonly UnityApi API;
@@ -35,13 +35,13 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
         protected readonly ILogger Logger;
 
         protected UnityHighlightingAbstractStage(CallGraphSwaExtensionProvider callGraphSwaExtensionProvider,
-            PerformanceCriticalCodeCallGraphMarksProvider performanceCriticalCodeCallGraphMarksProvider,
+            PerformanceCriticalCodeCallGraphRootMarksProvider performanceCriticalCodeCallGraphRootMarksProvider,
             IEnumerable<IUnityDeclarationHighlightingProvider> higlightingProviders,
             IEnumerable<IUnityProblemAnalyzer> performanceProblemAnalyzers, UnityApi api,
             UnityCommonIconProvider commonIconProvider, IElementIdProvider provider, ILogger logger)
         {
             myCallGraphSwaExtensionProvider = callGraphSwaExtensionProvider;
-            myPerformanceCriticalCodeCallGraphMarksProvider = performanceCriticalCodeCallGraphMarksProvider;
+            myPerformanceCriticalCodeCallGraphRootMarksProvider = performanceCriticalCodeCallGraphRootMarksProvider;
             HiglightingProviders = higlightingProviders;
             PerformanceProblemAnalyzers = performanceProblemAnalyzers;
             API = api;
@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
 
             
             return new UnityHighlightingProcess(process, file, myCallGraphSwaExtensionProvider,
-                myPerformanceCriticalCodeCallGraphMarksProvider, isPerformanceAnalysisEnabled,
+                myPerformanceCriticalCodeCallGraphRootMarksProvider, isPerformanceAnalysisEnabled,
                 HiglightingProviders, PerformanceProblemAnalyzers,
                 API, myCommonIconProvider, processKind, myProvider, Logger);
         }
@@ -71,7 +71,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
     public class UnityHighlightingProcess : CSharpDaemonStageProcessBase
     {
         private readonly CallGraphSwaExtensionProvider myCallGraphSwaExtensionProvider;
-        private readonly PerformanceCriticalCodeCallGraphMarksProvider myPerformanceCriticalCodeCallGraphMarksProvider;
+        private readonly PerformanceCriticalCodeCallGraphRootMarksProvider myPerformanceCriticalCodeCallGraphRootMarksProvider;
         private readonly bool myIsPerformanceAnalysisEnabled;
         private readonly IEnumerable<IUnityDeclarationHighlightingProvider> myDeclarationHighlightingProviders;
         private readonly IEnumerable<IUnityProblemAnalyzer> myPerformanceProblemAnalyzers;
@@ -91,7 +91,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
 
         public UnityHighlightingProcess([NotNull] IDaemonProcess process, [NotNull] ICSharpFile file,
             CallGraphSwaExtensionProvider callGraphSwaExtensionProvider,
-            PerformanceCriticalCodeCallGraphMarksProvider performanceCriticalCodeCallGraphMarksProvider,
+            PerformanceCriticalCodeCallGraphRootMarksProvider performanceCriticalCodeCallGraphRootMarksProvider,
             bool isPerformanceAnalysisEnabled,
             IEnumerable<IUnityDeclarationHighlightingProvider> declarationHighlightingProviders,
             IEnumerable<IUnityProblemAnalyzer> performanceProblemAnalyzers, UnityApi api,
@@ -101,7 +101,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
             : base(process, file)
         {
             myCallGraphSwaExtensionProvider = callGraphSwaExtensionProvider;
-            myPerformanceCriticalCodeCallGraphMarksProvider = performanceCriticalCodeCallGraphMarksProvider;
+            myPerformanceCriticalCodeCallGraphRootMarksProvider = performanceCriticalCodeCallGraphRootMarksProvider;
             myIsPerformanceAnalysisEnabled = isPerformanceAnalysisEnabled;
             myDeclarationHighlightingProviders = declarationHighlightingProviders;
             myPerformanceProblemAnalyzers = performanceProblemAnalyzers;
@@ -244,8 +244,8 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
                 if (!id.HasValue)
                     return false;
 
-                return myCallGraphSwaExtensionProvider.IsMarkedByCallGraphAnalyzer(
-                    myPerformanceCriticalCodeCallGraphMarksProvider.Id,
+                return myCallGraphSwaExtensionProvider.IsMarkedByCallGraphRootMarksProvider(
+                    myPerformanceCriticalCodeCallGraphRootMarksProvider.Id,
                     true, id.Value);
             }
 

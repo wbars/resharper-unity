@@ -14,12 +14,12 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCriticalCodeAnalysis.CallGraph
 {
     [SolutionComponent]
-    public class PerformanceCriticalCodeCallGraphMarksProvider : CallGraphRootMarksProviderBase
+    public class PerformanceCriticalCodeCallGraphRootMarksProvider : CallGraphRootMarksProviderBase
     {
         private readonly UnityApi myUnityApi;
         public static readonly string MarkId = "Unity.PerformanceCriticalContext";
 
-        public PerformanceCriticalCodeCallGraphMarksProvider(Lifetime lifetime, ISolution solution, UnityApi unityApi,
+        public PerformanceCriticalCodeCallGraphRootMarksProvider(Lifetime lifetime, ISolution solution, UnityApi unityApi,
             UnityReferencesTracker referencesTracker, UnitySolutionTracker tracker)
             : base(MarkId, new CallGraphOutcomingPropagator(solution, MarkId))
         {

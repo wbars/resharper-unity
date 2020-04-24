@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.Rider.Highlightings.IconsProviders
         private readonly AssetSerializationMode myAssetSerializationMode;
 
         public RiderEventHandlerDetector(ISolution solution, CallGraphSwaExtensionProvider callGraphSwaExtensionProvider, 
-            SettingsStore settingsStore, AssetIndexingSupport assetIndexingSupport, PerformanceCriticalCodeCallGraphMarksProvider marksProvider,AssetMethodsElementContainer assetMethodsElementContainer,
+            SettingsStore settingsStore, AssetIndexingSupport assetIndexingSupport, PerformanceCriticalCodeCallGraphRootMarksProvider marksProvider,AssetMethodsElementContainer assetMethodsElementContainer,
             UnityCodeInsightProvider codeInsightProvider, UnityUsagesCodeVisionProvider usagesCodeVisionProvider, DeferredCacheController deferredCacheController,
             UnitySolutionTracker solutionTracker, ConnectionTracker connectionTracker,
             IconHost iconHost, AssetSerializationMode assetSerializationMode, IElementIdProvider provider)

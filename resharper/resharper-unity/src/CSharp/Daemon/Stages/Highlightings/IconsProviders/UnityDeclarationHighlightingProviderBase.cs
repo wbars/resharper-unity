@@ -17,12 +17,12 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.Highlightings.I
     {
         protected readonly ISolution Solution;
         protected readonly CallGraphSwaExtensionProvider CallGraphSwaExtensionProvider;
-        protected readonly PerformanceCriticalCodeCallGraphMarksProvider MarksProvider;
+        protected readonly PerformanceCriticalCodeCallGraphRootMarksProvider MarksProvider;
         protected readonly IContextBoundSettingsStore Settings;
         private readonly IElementIdProvider myProvider;
 
         public UnityDeclarationHighlightingProviderBase(ISolution solution, CallGraphSwaExtensionProvider callGraphSwaExtensionProvider, 
-            SettingsStore settingsStore, PerformanceCriticalCodeCallGraphMarksProvider marksProvider, IElementIdProvider provider)
+            SettingsStore settingsStore, PerformanceCriticalCodeCallGraphRootMarksProvider marksProvider, IElementIdProvider provider)
         {
             Solution = solution;
             CallGraphSwaExtensionProvider = callGraphSwaExtensionProvider;

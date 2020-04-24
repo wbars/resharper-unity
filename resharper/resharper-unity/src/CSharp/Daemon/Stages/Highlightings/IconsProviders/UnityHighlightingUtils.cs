@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.Highlightings.I
 
         public static bool HasHotIcon(this ICSharpDeclaration element,
             CallGraphSwaExtensionProvider callGraphSwaExtensionProvider, IContextBoundSettingsStore settingsStore,
-            PerformanceCriticalCodeCallGraphMarksProvider marksProvider, DaemonProcessKind kind, IElementIdProvider provider)
+            PerformanceCriticalCodeCallGraphRootMarksProvider marksProvider, DaemonProcessKind kind, IElementIdProvider provider)
         {
             var declaredElement = element.DeclaredElement;
             if (declaredElement == null)
@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.Highlightings.I
         
         public static bool HasHotIcon(this IDeclaredElement element,
             CallGraphSwaExtensionProvider callGraphSwaExtensionProvider, IContextBoundSettingsStore settingsStore,
-            PerformanceCriticalCodeCallGraphMarksProvider marksProvider, DaemonProcessKind kind, IElementIdProvider provider)
+            PerformanceCriticalCodeCallGraphRootMarksProvider marksProvider, DaemonProcessKind kind, IElementIdProvider provider)
         {
             if (!settingsStore.GetValue((UnitySettings key) => key.EnableIconsForPerformanceCriticalCode))
                 return false;
@@ -48,12 +48,12 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.Highlightings.I
             if (!id.HasValue)
                 return false;
 
-            return callGraphSwaExtensionProvider.IsMarkedByCallGraphAnalyzer(marksProvider.Id, 
+            return callGraphSwaExtensionProvider.IsMarkedByCallGraphRootMarksProvider(marksProvider.Id, 
                 kind == DaemonProcessKind.GLOBAL_WARNINGS, id.Value);
         }
 
         public static void AddHotHighlighting(this IHighlightingConsumer consumer,
-            CallGraphSwaExtensionProvider swaExtensionProvider, ICSharpDeclaration element, PerformanceCriticalCodeCallGraphMarksProvider marksProvider,
+            CallGraphSwaExtensionProvider swaExtensionProvider, ICSharpDeclaration element, PerformanceCriticalCodeCallGraphRootMarksProvider marksProvider,
             IContextBoundSettingsStore settings, string text,
             string tooltip, DaemonProcessKind kind, IEnumerable<BulbMenuItem> items, IElementIdProvider provider, bool onlyHot = false)
         {
