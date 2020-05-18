@@ -31,20 +31,20 @@ class UnityProjectModelViewExtensionsTest : ProjectModelBaseTest() {
     }
 
     @Test
-    @TestEnvironment(solution = "RiderMoveFile") // RIDER-41182
+    @TestEnvironment(solution = "UnityProjectModelViewExtensionsTest") // RIDER-41182
     fun testMoveFile() {
         val action = {
             // in Rider move the script file "MyScript" into "SomeFolder"
             // meta file should be moved together with script
 
-            cutItem2(project, arrayOf("Assets", "MyScript.cs"))
-            pasteItem2(project, arrayOf("Assets", "SomeFolder"), "MyScript.cs")
+            cutItem2(project, arrayOf("Assets", "Class1.cs"))
+            pasteItem2(project, arrayOf("Assets", "NewDirectory1"), "Class1.cs")
         }
-        val metaFileContent = Paths.get(project.basePath!!).resolve("Assets").resolve("MyScript.cs.meta").toFile().readText()
+        val metaFileContent = Paths.get(project.basePath!!).resolve("Assets").resolve("Class1.cs.meta").toFile().readText()
 
         doActionAndWait(project, action,true)
 
-        val metaFile = Paths.get(project.basePath!!).resolve("Assets").resolve("SomeFolder").resolve("MyScript.cs.meta").toFile()
+        val metaFile = Paths.get(project.basePath!!).resolve("Assets").resolve("NewDirectory1").resolve("Class1.cs.meta").toFile()
         Assert.assertTrue(metaFile.exists(), "meta file $metaFile doesn't exist.")
         Assert.assertEquals(metaFileContent, metaFile.readText())
     }
