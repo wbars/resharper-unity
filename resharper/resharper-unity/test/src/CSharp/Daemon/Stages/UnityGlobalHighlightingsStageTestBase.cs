@@ -28,8 +28,8 @@ namespace JetBrains.ReSharper.Plugins.Unity.Tests.CSharp.Daemon.Stages
             using (TestPsiConfigurationSettings.Instance.PersistCachesCookie())
             using (swea.RunAnalysisCookie())
             {
-                ChangeSettingsTemporarily(lifetime).BoundStore.SetValue((UnitySettings key) => 
-                    key.PerformanceHighlightingMode, PerformanceHighlightingMode.Always);
+                // ChangeSettingsTemporarily(lifetime).BoundStore.SetValue((UnitySettings key) => 
+                //     key.PerformanceHighlightingMode, PerformanceHighlightingMode.Always);
 
                 var files = swea.GetFilesToAnalyze().OrderBy(f => f.Name).ToList();
                 swea.ReanalyzeAll();

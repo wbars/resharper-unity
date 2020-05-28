@@ -13,7 +13,6 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.Analysis;
 using JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.BurstCodeAnalysis.CallGraph;
 using JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.Highlightings.IconsProviders;
-using JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCriticalCodeAnalysis;
 using JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCriticalCodeAnalysis.Analyzers;
 using JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCriticalCodeAnalysis.CallGraph;
 using JetBrains.ReSharper.Plugins.Unity.ProjectModel;
@@ -59,37 +58,20 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
             IContextBoundSettingsStore settings,
             DaemonProcessKind processKind, ICSharpFile file)
         {
-            if (!file.GetProject().IsUnityProject())
-                return null;
-
-            var isPerformanceAnalysisEnabled =
-                settings.GetValue((UnitySettings s) => s.EnablePerformanceCriticalCodeHighlighting);
-            var isBurstAnalysisEnabled = settings.GetValue((UnitySettings s) => s.EnableBurstCodeHighlighting);
-
 
             return new UnityHighlightingProcess(process, file, myCallGraphSwaExtensionProvider,
-                myPerformanceCriticalCodeCallGraphMarksProvider, isPerformanceAnalysisEnabled,
-                myCallGraphBurstMarksProvider, isBurstAnalysisEnabled,
-                HiglightingProviders, PerformanceProblemAnalyzers,
-                API, myCommonIconProvider, processKind, myProvider, Logger);
+                myCallGraphBurstMarksProvider,PerformanceProblemAnalyzers,processKind,
+                myProvider ,Logger);
         }
     }
 
     public class UnityHighlightingProcess : CSharpDaemonStageProcessBase
     {
         private readonly CallGraphSwaExtensionProvider myCallGraphSwaExtensionProvider;
-        private readonly PerformanceCriticalCodeCallGraphMarksProvider myPerformanceCriticalCodeCallGraphMarksProvider;
-        private readonly bool myIsPerformanceAnalysisEnabled;
         private readonly CallGraphBurstMarksProvider myCallGraphBurstMarksProvider;
-        private readonly bool myIsBurstAnalysisEnabled;
-        private readonly IEnumerable<IUnityDeclarationHighlightingProvider> myDeclarationHighlightingProviders;
-        private readonly IEnumerable<IUnityProblemAnalyzer> myPerformanceProblemAnalyzers;
-        private readonly UnityApi myAPI;
-        private readonly UnityCommonIconProvider myCommonIconProvider;
         private readonly DaemonProcessKind myProcessKind;
         private readonly IElementIdProvider myProvider;
         private readonly ILogger myLogger;
-        private readonly ISet<IDeclaredElement> myMarkedDeclarations = new HashSet<IDeclaredElement>();
         private readonly JetHashSet<IMethod> myEventFunctions;
 
         private readonly Dictionary<UnityProblemAnalyzerContext, List<IUnityProblemAnalyzer>>
@@ -103,25 +85,14 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
 
         public UnityHighlightingProcess([NotNull] IDaemonProcess process, [NotNull] ICSharpFile file,
             CallGraphSwaExtensionProvider callGraphSwaExtensionProvider,
-            PerformanceCriticalCodeCallGraphMarksProvider performanceCriticalCodeCallGraphMarksProvider,
-            bool isPerformanceAnalysisEnabled,
-            CallGraphBurstMarksProvider callGraphBurstMarksProvider, bool isBurstAnalysisEnabled,
-            IEnumerable<IUnityDeclarationHighlightingProvider> declarationHighlightingProviders,
-            IEnumerable<IUnityProblemAnalyzer> performanceProblemAnalyzers, UnityApi api,
-            UnityCommonIconProvider commonIconProvider,
+            CallGraphBurstMarksProvider callGraphBurstMarksProvider,
+            IEnumerable<IUnityProblemAnalyzer> performanceProblemAnalyzers,
             DaemonProcessKind processKind, IElementIdProvider provider,
             ILogger logger)
             : base(process, file)
         {
             myCallGraphSwaExtensionProvider = callGraphSwaExtensionProvider;
-            myPerformanceCriticalCodeCallGraphMarksProvider = performanceCriticalCodeCallGraphMarksProvider;
-            myIsPerformanceAnalysisEnabled = isPerformanceAnalysisEnabled;
             myCallGraphBurstMarksProvider = callGraphBurstMarksProvider;
-            myIsBurstAnalysisEnabled = isBurstAnalysisEnabled;
-            myDeclarationHighlightingProviders = declarationHighlightingProviders;
-            myPerformanceProblemAnalyzers = performanceProblemAnalyzers;
-            myAPI = api;
-            myCommonIconProvider = commonIconProvider;
             myProcessKind = processKind;
             myProvider = provider;
             myLogger = logger;
@@ -131,7 +102,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
 
             DaemonProcess.CustomData.PutData(UnityEventFunctionAnalyzer.UnityEventFunctionNodeKey, myEventFunctions);
 
-            myProblemAnalyzersByContext = myPerformanceProblemAnalyzers.GroupBy(t => t.Context)
+            myProblemAnalyzersByContext = performanceProblemAnalyzers.GroupBy(t => t.Context)
                 .ToDictionary(t => t.Key, t => t.ToList());
         }
 
@@ -141,42 +112,13 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
                 DaemonProcess.ContextBoundSettingsStore);
             File.ProcessThisAndDescendants(this, highlightingConsumer);
 
-            foreach (var declaration in File.Descendants<ICSharpFunctionDeclaration>())
-            {
-                var declaredElement = declaration.DeclaredElement;
-                if (declaredElement == null)
-                    continue;
-
-                if (myEventFunctions != null && Enumerable.Contains(myEventFunctions, declaredElement))
-                {
-                    var method = (declaredElement as IMethod).NotNull("method != null");
-                    var eventFunction = myAPI.GetUnityEventFunction(method);
-                    if (eventFunction == null) // happens after event function refactoring 
-                        continue;
-
-                    myCommonIconProvider.AddEventFunctionHighlighting(highlightingConsumer, method, eventFunction,
-                        "Event function", myProcessKind);
-                    myMarkedDeclarations.Add(method);
-                }
-                else
-                {
-                    if (myMarkedDeclarations.Contains(declaredElement))
-                        continue;
-
-                    myCommonIconProvider.AddFrequentlyCalledMethodHighlighting(highlightingConsumer, declaration,
-                        "Frequently called", "Frequently called code", myProcessKind);
-                }
-            }
-
             committer(new DaemonStageResult(highlightingConsumer.Highlightings));
         }
 
         private UnityProblemAnalyzerContext GetProblemAnalyzerContext(ITreeNode element)
         {
             var res = new UnityProblemAnalyzerContext();
-            if (myIsPerformanceAnalysisEnabled && IsPerformanceCriticalDeclaration(element))
-                res |= UnityProblemAnalyzerContext.PERFOMANCE_CONTEXT;
-            if (myIsBurstAnalysisEnabled && IsBurstDeclaration(element))
+            if (IsBurstDeclaration(element))
                 res |= UnityProblemAnalyzerContext.BURST_CONTEXT;
             return res;
         }
@@ -187,27 +129,16 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
             {
                 case IThrowStatement _:
                 case IThrowExpression _:
-                case IInvocationExpression invocationExpression when IsBurstDiscarded(invocationExpression):
                     return true;
                 default:
                     return false;
             }
         }
 
-        private static bool IsBurstDiscarded(ITreeNode node)
-        {
-            if (!(node is IInvocationExpression expression))
-                return false;
-            var invokedMethod = expression.InvocationExpressionReference.Resolve().DeclaredElement as IMethod;
-            if (invokedMethod == null)
-                return false;
-            return invokedMethod.GetAttributeInstances(KnownTypes.BurstDiscardAttribute, AttributesSource.Self).Count != 0;
-        }
-
         private UnityProblemAnalyzerContext GetProhibitedContexts(ITreeNode node)
         {
             var context = UnityProblemAnalyzerContext.NONE;
-            if (node is IThrowStatement || node is IThrowExpression || IsBurstDiscarded(node))
+            if (node is IThrowStatement || node is IThrowExpression)
                 context |= UnityProblemAnalyzerContext.BURST_CONTEXT;
             return context;
         }
@@ -220,19 +151,6 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
                 myProblemAnalyzerContexts.Push(GetProblemAnalyzerContext(element));
             if (IsProhibitedNode(element))
                 myProhibitedContexts.Push(GetProhibitedContexts(element));
-
-            if (element is ICSharpDeclaration declaration)
-            {
-                foreach (var unityDeclarationHiglightingProvider in myDeclarationHighlightingProviders)
-                {
-                    var result =
-                        unityDeclarationHiglightingProvider.AddDeclarationHighlighting(declaration, consumer,
-                            myProcessKind);
-                    if (result)
-                        myMarkedDeclarations.Add(
-                            declaration.DeclaredElement.NotNull("declaration.DeclaredElement != null"));
-                }
-            }
 
             try
             {
@@ -296,15 +214,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
                     return false;
             }
         }
-
-
-        private bool IsPerformanceCriticalDeclaration(ITreeNode element)
-        {
-            return IsRootDeclaration(element,
-                PerformanceCriticalCodeStageUtil.IsPerformanceCriticalRootMethod,
-                myPerformanceCriticalCodeCallGraphMarksProvider.Id);
-        }
-
+        
         private bool IsBurstDeclaration(ITreeNode element)
         {
             return IsRootDeclaration(element,
