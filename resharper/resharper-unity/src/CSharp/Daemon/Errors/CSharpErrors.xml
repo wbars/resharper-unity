@@ -376,7 +376,7 @@
       <Argument>TypeQualification</Argument>
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1005" configurableSeverity="Unity.BC1005">
@@ -384,7 +384,7 @@
     <Message value="Burst error BC1005: The `try` construction is not supported.">
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1016" configurableSeverity="Unity.BC1016">
@@ -394,7 +394,7 @@
       <Argument>FunctionSignature</Argument>
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1020" configurableSeverity="Unity.BC1020">
@@ -404,7 +404,7 @@
       <Argument>TypeQualification</Argument>
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1021" configurableSeverity="Unity.BC1021">
@@ -414,14 +414,14 @@
       <Argument>TypeQualification</Argument>
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1033" configurableSeverity="Unity.BC1033">
     <Parameter type="DocumentRange" name="range" />
     <Message value="Burst error BC1033: Loading a managed string literal is not supported"/>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1034" configurableSeverity="Unity.BC1034">
@@ -431,7 +431,7 @@
       <Argument>FieldQualification</Argument>
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1036" configurableSeverity="Unity.BC1036">
@@ -439,7 +439,7 @@
     <Message value="Burst error BC1036: The `finally` construction (e.g `foreach`/`using`) is not supported">
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1037" configurableSeverity="Unity.BC1037">
@@ -447,7 +447,7 @@
     <Message value="Burst error BC1037: The `try` construction (e.g `foreach`/`using`) is not supported">
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1042" configurableSeverity="Unity.BC1042">
@@ -459,7 +459,7 @@
       <Argument>FieldQualification</Argument>
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
 
   <Error name="BC1042Short" configurableSeverity="Unity.BC1042Short">
@@ -469,7 +469,7 @@
       <Argument>TypeQualification</Argument>
     </Message>
     <Range>Range</Range>
-    <Behavour overlapResolvePolicy="NONE" />
+    <Behavour overlapResolvePolicy="ERROR" />
   </Error>
   
   <Warning name="UnknownInputAxes" configurableSeverity="Unity.UnknownInputAxes">
