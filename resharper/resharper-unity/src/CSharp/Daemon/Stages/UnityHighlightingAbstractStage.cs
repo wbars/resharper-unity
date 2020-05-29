@@ -73,6 +73,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
         private readonly IElementIdProvider myProvider;
         private readonly ILogger myLogger;
         private readonly JetHashSet<IMethod> myEventFunctions;
+        private readonly HashSet<IDeclaredElement> myCollectedRootElements = new HashSet<IDeclaredElement>();
 
         private readonly Dictionary<UnityProblemAnalyzerContext, List<IUnityProblemAnalyzer>>
             myProblemAnalyzersByContext;
@@ -143,10 +144,18 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
             return context;
         }
 
+        public void CollectRootElements(ITreeNode node)
+        {
+            var roots = myCallGraphBurstMarksProvider.GetRootMarksFromNode(node, null);
+            foreach (var element in roots)
+                myCollectedRootElements.Add(element);
+        }
+
         public override void ProcessBeforeInterior(ITreeNode element, IHighlightingConsumer consumer)
         {
             // it's ok that creating context does not force new prohibiting context
             // reason: prohibiting context has higher priority than creating. example: burst
+            CollectRootElements(element);
             if (IsFunctionNode(element))
                 myProblemAnalyzerContexts.Push(GetProblemAnalyzerContext(element));
             if (IsProhibitedNode(element))
@@ -218,9 +227,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
         private bool IsBurstDeclaration(ITreeNode element)
         {
             return IsRootDeclaration(element,
-                // ReSharper disable once AssignNullToNotNullAttribute
-                declaration =>
-                    myCallGraphBurstMarksProvider.GetRootMarksFromNode(declaration, null).FirstOrDefault() != null,
+                declaration => myCollectedRootElements.Contains(declaration.DeclaredElement),
                 myCallGraphBurstMarksProvider.Id);
         }
 
