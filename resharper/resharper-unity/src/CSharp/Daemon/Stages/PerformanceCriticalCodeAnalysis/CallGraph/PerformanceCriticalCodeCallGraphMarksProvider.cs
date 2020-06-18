@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Collections.Viewable;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Daemon.CallGraph;
 using JetBrains.ReSharper.Daemon.CSharp.CallGraph;
 using JetBrains.ReSharper.Plugins.Unity.CSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.Unity.ProjectModel;
@@ -10,6 +12,7 @@ using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Collections;
 
 namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCriticalCodeAnalysis.CallGraph
 {
@@ -27,8 +30,9 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
             Enabled.Value = tracker.IsUnityProject.HasTrueValue();
             referencesTracker.HasUnityReference.Advise(lifetime, b => Enabled.Value = Enabled.Value | b);
         }
-        
-        public override LocalList<IDeclaredElement> GetMarkedFunctionsFrom(ITreeNode currentNode, IDeclaredElement containingFunction)
+
+        public override LocalList<IDeclaredElement> GetRootMarksFromNode(ITreeNode currentNode,
+            IDeclaredElement containingFunction)
         {
             var result = new LocalList<IDeclaredElement>();
             if (PerformanceCriticalCodeStageUtil.IsPerformanceCriticalRootMethod(myUnityApi, currentNode))
@@ -42,6 +46,18 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
 
             return result;
         }
+
+        public override LocalList<IDeclaredElement> GetBanMarksFromNode(ITreeNode currentNode,
+            IDeclaredElement containingFunction)
+        {
+            return new LocalList<IDeclaredElement>();
+        }
+
+        public override IEnumerable<ICallGraphEdgeProvider> EdgeProviders =>
+            EmptyList<ICallGraphEdgeProvider>.Enumerable;
+
+        public override IEnumerable<ICallGraphBannedEdgeProvider> BannedEdgeProviders =>
+            EmptyList<ICallGraphBannedEdgeProvider>.Enumerable;
 
         private IDeclaredElement ExtractCoroutineOrInvokeRepeating(ITreeNode currentNode)
         {
@@ -64,7 +80,6 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
 
                 if (containingType == null || containingType.GetClrName().Equals(KnownTypes.MonoBehaviour))
                 {
-                    
                     if (!declaredElement.ShortName.Equals("StartCoroutine") &&
                         !declaredElement.ShortName.Equals("InvokeRepeating"))
                     {
@@ -81,14 +96,15 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
 
             return null;
         }
-        
-        private IDeclaredElement ExtractMethodDeclarationFromStartCoroutine([NotNull]ICSharpExpression firstArgument)
+
+        private IDeclaredElement ExtractMethodDeclarationFromStartCoroutine([NotNull] ICSharpExpression firstArgument)
         {
             // 'StartCoroutine' has overload with string. We have already attached reference, so get declaration from
             // reference
             if (firstArgument is ILiteralExpression literalExpression)
             {
-                var coroutineMethodReference = literalExpression.GetReferences<UnityEventFunctionReference>().FirstOrDefault();
+                var coroutineMethodReference =
+                    literalExpression.GetReferences<UnityEventFunctionReference>().FirstOrDefault();
                 if (coroutineMethodReference != null)
                 {
                     return coroutineMethodReference.Resolve().DeclaredElement;

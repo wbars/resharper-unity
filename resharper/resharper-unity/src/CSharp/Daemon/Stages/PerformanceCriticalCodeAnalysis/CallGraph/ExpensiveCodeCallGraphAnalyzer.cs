@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using JetBrains.Collections.Viewable;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Daemon.CallGraph;
 using JetBrains.ReSharper.Daemon.CSharp.CallGraph;
 using JetBrains.ReSharper.Plugins.Unity.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -23,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
             referencesTracker.HasUnityReference.Advise(lifetime, b => Enabled.Value = Enabled.Value | b);
         }
         
-        public override LocalList<IDeclaredElement> GetMarkedFunctionsFrom(ITreeNode currentNode, IDeclaredElement containingFunction)
+        public override LocalList<IDeclaredElement> GetRootMarksFromNode(ITreeNode currentNode, IDeclaredElement containingFunction)
         {
             var result = new LocalList<IDeclaredElement>();
             switch (currentNode)
@@ -37,5 +39,13 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
 
             return result;
         }
+
+        public override LocalList<IDeclaredElement> GetBanMarksFromNode(ITreeNode currentNode, IDeclaredElement containingFunction)
+        {
+            return new LocalList<IDeclaredElement>();
+        }
+
+        public override IEnumerable<ICallGraphEdgeProvider> EdgeProviders => EmptyList<ICallGraphEdgeProvider>.Enumerable;
+        public override IEnumerable<ICallGraphBannedEdgeProvider> BannedEdgeProviders { get; }
     }
 }

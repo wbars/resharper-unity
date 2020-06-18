@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Daemon.CallGraph;
 using JetBrains.ReSharper.Daemon.CSharp.CallGraph;
 using JetBrains.ReSharper.Daemon.CSharp.Stages;
 using JetBrains.ReSharper.Daemon.UsageChecking;
@@ -244,7 +245,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages
                 if (!id.HasValue)
                     return false;
 
-                return myCallGraphSwaExtensionProvider.IsMarkedByCallGraphAnalyzer(
+                return myCallGraphSwaExtensionProvider.IsMarkedByCallGraphRootMarksProvider(
                     myPerformanceCriticalCodeCallGraphMarksProvider.Id,
                     true, id.Value);
             }

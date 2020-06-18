@@ -1,4 +1,5 @@
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Daemon.CallGraph;
 using JetBrains.ReSharper.Daemon.CSharp.CallGraph;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -40,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.PerformanceCrit
                 if (!id.HasValue)
                     return;
 
-                if (mySwaExtensionProvider.IsMarkedByCallGraphAnalyzer(myExpensiveCodeCallGraphAnalyzer.Id, true, id.Value))
+                if (mySwaExtensionProvider.IsMarkedByCallGraphRootMarksProvider(myExpensiveCodeCallGraphAnalyzer.Id, true, id.Value))
                 {
                     CreateHiglighting(expression, consumer);
                 }

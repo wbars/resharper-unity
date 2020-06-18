@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Application.Settings;
 using JetBrains.Application.UI.Controls.BulbMenu.Items;
 using JetBrains.ReSharper.Daemon;
+using JetBrains.ReSharper.Daemon.CallGraph;
 using JetBrains.ReSharper.Daemon.CSharp.CallGraph;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -48,7 +49,7 @@ namespace JetBrains.ReSharper.Plugins.Unity.CSharp.Daemon.Stages.Highlightings.I
             if (!id.HasValue)
                 return false;
 
-            return callGraphSwaExtensionProvider.IsMarkedByCallGraphAnalyzer(marksProvider.Id, 
+            return callGraphSwaExtensionProvider.IsMarkedByCallGraphRootMarksProvider(marksProvider.Id, 
                 kind == DaemonProcessKind.GLOBAL_WARNINGS, id.Value);
         }
 
